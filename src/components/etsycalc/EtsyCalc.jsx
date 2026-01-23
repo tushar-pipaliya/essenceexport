@@ -4,6 +4,16 @@ import "animate.css";
 import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
 
+// Helper component for mobile view fields
+const DataField = ({ label, value, bold = false, italic = false, highlight = false }) => (
+    <div className={`flex flex-col border-b border-slate-50 pb-1 ${highlight ? 'bg-blue-50/50 p-1 rounded' : ''}`}>
+        <span className="text-slate-400 font-semibold uppercase text-[8px] tracking-tighter">{label}</span>
+        <span className={`text-slate-800 ${bold ? 'font-bold' : 'font-medium'} ${italic ? 'italic text-slate-500' : ''}`}>
+            {value}
+        </span>
+    </div>
+);
+
 const EtsyCalc = () => {
     // 1. Global Parameters (Market Rates)
     const defaultParams = {
@@ -61,7 +71,7 @@ const EtsyCalc = () => {
 
         const baseR = row.type === "PLATINUM" ? params["Platinum Rate (Per Gram)"] : params["Gold Rate (Per Gram)"];
         const goldCost = w * baseR * row.gPct;
-        
+
         const currentLaborRate = row.isSilver ? params["Silver Labor (Per Gram)"] : params["Gold Labor (Per Gram)"];
         const laborCost = w * currentLaborRate;
 
@@ -71,15 +81,13 @@ const EtsyCalc = () => {
         const shipping = w > 0 ? Number(params["Shipping & Handling"]) : 0;
 
         const subTotal = goldCost + laborCost + mainCost + sideCost + smallCost + shipping;
-        
-        // Reverse Engineering the Listing Price
+
         const finalINR = (subTotal + p) / (1 - params["Etsy Commission (%)"] / 100);
         const commission = finalINR * (params["Etsy Commission (%)"] / 100);
         const listingINR = finalINR / (1 - params["Listing Discount (%)"] / 100);
         const priceUSD = listingINR / params["USD Exchange Rate"];
         const costPrice = finalINR - p;
 
-        // Applying toFixed(2) to all financial values for consistent UI
         return {
             goldCost: goldCost.toFixed(2),
             laborCost: laborCost.toFixed(2),
@@ -92,7 +100,6 @@ const EtsyCalc = () => {
             listingINR: listingINR.toFixed(2),
             priceUSD: priceUSD.toFixed(2),
             costPrice: costPrice.toFixed(2),
-            currentLaborRate: parseFloat(currentLaborRate).toFixed(2)
         };
     };
 
@@ -108,7 +115,6 @@ const EtsyCalc = () => {
             showCancelButton: true,
             confirmButtonColor: "#ef4444",
             confirmButtonText: "Yes, Reset",
-            // width:60
         }).then((result) => {
             if (result.isConfirmed) {
                 localStorage.removeItem("master_params_v2");
@@ -124,7 +130,6 @@ const EtsyCalc = () => {
             <main className="flex-grow p-2 md:p-4">
                 <div className="max-w-[2200px] mx-auto bg-white rounded-lg shadow-xl overflow-hidden border border-slate-200">
                     <div className="bg-white space-y-6 p-4">
-
                         {/* Section 1: Item Specifics */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-2 gap-3 md:gap-4">
                             {Object.keys(itemSpecs).map((key) => (
@@ -156,7 +161,7 @@ const EtsyCalc = () => {
                                             type="number"
                                             value={params[key]}
                                             onChange={(e) => setParams({ ...params, [key]: e.target.value })}
-                                            className="h-9 px-3 rounded-xl bg-gradient-to-b from-slate-50 to-slate-200 border border-slate-300 text-[12px] font-semibold text-slate-800 shadow-[inset_0_1px_3px_rgba(0,0,0,0.15)] outline-none transition-all hover:from-slate-100 hover:to-slate-200 focus:from-white focus:to-slate-100 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/25 active:scale-[0.98]"
+                                            className="h-9 px-3 rounded-xl bg-gradient-to-b from-slate-50 to-slate-200 border border-slate-300 text-[12px] font-semibold text-slate-800 shadow-[inset_0_1px_3_rgba(0,0,0,0.15)] outline-none transition-all hover:from-slate-100 hover:to-slate-200 focus:from-white focus:to-slate-100 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/25 active:scale-[0.98]"
                                         />
                                     </div>
                                 ))}
@@ -166,25 +171,25 @@ const EtsyCalc = () => {
 
                     {/* Section 3: Result View */}
                     <div className="overflow-hidden bg-white border-t border-slate-300">
-                        {/* DESKTOP TABLE VIEW */}
+                        {/* Desktop Table View */}
                         <div className="hidden lg:block overflow-x-auto">
                             <table className="w-full min-w-[1800px] border-collapse text-[12px] text-center table-fixed">
                                 <thead>
                                     <tr className="bg-slate-200 text-slate-700 font-bold uppercase border-b border-slate-300">
-                                        <th className="p-3 w-[150px] text-left border-r border-slate-300 ">Metal Type</th>
-                                        <th className="p-2 w-[80px] border-r border-slate-300">Gold %</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-300">Diamond Type</th>
-                                        <th className="p-2 w-[110px] border-r border-slate-300">Gold Cost</th>
-                                        <th className="p-2 w-[110px] border-r border-slate-300">Labor Cost</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-300">Main Diamond</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-300">Side Diamond</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-300">Small Diamond</th>
-                                        <th className="p-2 w-[100px] border-r border-slate-300">Shipping</th>
-                                        <th className="p-2 w-[110px] border-r border-slate-300">Commission</th>
-                                        <th className="p-2 w-[120px] border-r border-slate-300">Final INR</th>
-                                        <th className="p-2 w-[120px] border-r border-slate-300">Listing INR</th>
-                                        <th className="p-2 w-[100px] border-r border-slate-300 ">Price $</th>
-                                        <th className="p-2 w-[120px] italic">Cost Price</th>
+                                        <th className="p-3 w-[150px] text-left border-r border-slate-200">Metal Type</th>
+                                        <th className="p-2 w-[80px] border-r border-slate-200">Gold %</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Diamond Type</th>
+                                        <th className="p-2 w-[110px] border-r border-slate-200">Gold Cost</th>
+                                        <th className="p-2 w-[110px] border-r border-slate-200">Labor Cost</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Main Diamond</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Side Diamond</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Small Diamond</th>
+                                        <th className="p-2 w-[100px] border-r border-slate-200">Shipping</th>
+                                        <th className="p-2 w-[110px] border-r border-slate-200">Commission</th>
+                                        <th className="p-2 w-[120px] border-r border-slate-200">Final INR</th>
+                                        <th className="p-2 w-[120px] border-r border-slate-200">Listing INR</th>
+                                        <th className="p-2 w-[100px] border-r border-slate-200">Price $</th>
+                                        <th className="p-2 w-[120px] border-r border-slate-200 italic">Cost Price</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200">
@@ -194,14 +199,9 @@ const EtsyCalc = () => {
                                             <tr key={row.id} className="hover:bg-blue-50/30 transition-colors">
                                                 <td className="p-3 text-left font-bold text-slate-900 border-r border-slate-200">{row.type}</td>
                                                 <td className="p-2 border-r border-slate-200">{row.gPct > 0 ? (row.gPct * 100).toFixed(1) + '%' : "-"}</td>
-                                                <td className="p-2 border-r border-slate-200 italic text-slate-500 ">{row.dType}</td>
+                                                <td className="p-2 border-r border-slate-200 italic text-slate-500">{row.dType}</td>
                                                 <td className="p-2 border-r border-slate-200 font-medium">₹{c.goldCost}</td>
-                                                <td className="p-2 border-r border-slate-200 font-medium">
-                                                    <div className="flex flex-col text-center">
-                                                        <span>₹{c.laborCost}</span>
-                                                        {/* <span className="text-[8px] text-slate-400">(@{c.currentLaborRate})</span> */}
-                                                    </div>
-                                                </td>
+                                                <td className="p-2 border-r border-slate-200 font-medium">₹{c.laborCost}</td>
                                                 <td className="p-2 border-r border-slate-200">₹{c.mainCost}</td>
                                                 <td className="p-2 border-r border-slate-200">₹{c.sideCost}</td>
                                                 <td className="p-2 border-r border-slate-200">₹{c.smallCost}</td>
@@ -224,29 +224,28 @@ const EtsyCalc = () => {
                                 const c = calculate(row);
                                 return (
                                     <div key={row.id} className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                                        <div className="bg-slate-200 text-slate-700 p-3 flex justify-between items-center">
-                                            <span className="font-bold text-xs uppercase">{row.type}</span>
-                                            <span className="bg-indigo-600 text-white px-3 py-1 rounded-full font-bold text-xs">
-                                                ${c.priceUSD}
+                                        {/* Header: Metal Type and Price in USD */}
+                                        <div className="bg-slate-200 text-white p-3 flex justify-between items-center">
+                                            <span className="bg-slate-200 text-slate-700 font-bold">{row.type}</span>
+                                            <span className="bg-gray-500 text-white px-3 py-1 rounded-full   font-bold text-sm shadow-sm">
+                                                LISTING ₹{c.listingINR}
                                             </span>
                                         </div>
-                                        <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-3 text-[11px]">
-                                            <div className="flex flex-col border-b border-slate-50 pb-1">
-                                                <span className="text-slate-400 font-semibold uppercase text-[9px]">Listing INR</span>
-                                                <span className="text-slate-800 font-bold">₹{c.listingINR}</span>
-                                            </div>
-                                            <div className="flex flex-col border-b border-slate-50 pb-1">
-                                                <span className="text-slate-400 font-semibold uppercase text-[9px]">Gold Cost</span>
-                                                <span className="text-slate-800 font-medium">₹{c.goldCost}</span>
-                                            </div>
-                                            <div className="flex flex-col border-b border-slate-50 pb-1">
-                                                <span className="text-slate-400 font-semibold uppercase text-[9px]">Labor Cost</span>
-                                                <span className="text-slate-800 font-medium">₹{c.laborCost}</span>
-                                            </div>
-                                            <div className="flex flex-col border-b border-slate-50 pb-1">
-                                                <span className="text-slate-400 font-semibold uppercase text-[9px]">Final INR</span>
-                                                <span className="text-slate-800 font-medium">₹{c.finalINR}</span>
-                                            </div>
+
+                                        {/* Body: All details including Listing INR */}
+                                        <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-3">
+                                            <DataField label="Diamond Type" value={row.dType} italic />
+                                            <DataField label="Gold %" value={row.gPct > 0 ? (row.gPct * 100).toFixed(1) + '%' : "N/A"} />
+                                            <DataField label="Gold Cost" value={`₹${c.goldCost}`} />
+                                            <DataField label="Labor Cost" value={`₹${c.laborCost}`} />
+                                            <DataField label="Main Stone" value={`₹${c.mainCost}`} />
+                                            <DataField label="Side Stone" value={`₹${c.sideCost}`} />
+                                            <DataField label="Small Stone" value={`₹${c.smallCost}`} />
+                                            <DataField label="Shipping" value={`₹${c.shipping}`} />
+                                            <DataField label="Commission" value={`₹${c.commission}`} />
+                                            <DataField label="Final INR" value={`$${c.finalINR}`} highlight />
+                                            <DataField label="Price$" value={`${c.priceUSD}`} bold />
+                                            <DataField label="Cost Price" value={`₹${c.costPrice}`} italic />
                                         </div>
                                     </div>
                                 );
