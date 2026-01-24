@@ -26,7 +26,7 @@ const Navbar = ({ onReset, onSave }) => {
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
               Jewelry Cost Master
             </h1>
-            <p className="text-sm lg:text-base font-medium text-indigo-600 mt-1 tracking-wide">
+            <p className="text-sm lg:text-base font-medium text-blue-400 mt-1 tracking-wide">
               Gold • Lab Diamonds • Moissanite
             </p>
           </div>

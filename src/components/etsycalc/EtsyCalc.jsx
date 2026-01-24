@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import "animate.css";
 import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
 
-// Helper component for mobile view fields
 const DataField = ({ label, value, bold = false, italic = false, highlight = false }) => (
     <div className={`flex flex-col border-b border-slate-50 pb-1 ${highlight ? 'bg-blue-50/50 p-1 rounded' : ''}`}>
         <span className="text-slate-400 font-semibold uppercase text-[8px] tracking-tighter">{label}</span>
@@ -15,7 +14,6 @@ const DataField = ({ label, value, bold = false, italic = false, highlight = fal
 );
 
 const EtsyCalc = () => {
-    // 1. Global Parameters (Market Rates)
     const defaultParams = {
         "Gold Rate (Per Gram)": 15000,
         "Platinum Rate (Per Gram)": 6000,
@@ -36,16 +34,19 @@ const EtsyCalc = () => {
         return saved ? JSON.parse(saved) : defaultParams;
     });
 
-    // 2. Specific Item Inputs
     const [itemSpecs, setItemSpecs] = useState({
         "Metal Weight (g)": "",
         "Main Stone Carat": "",
         "Side Stone Carat": "",
         "Small Stone Carat": "",
-        "Desired Profit (INR)": "",
     });
 
-    // 3. Row Configuration
+    const [rowProfits, setRowProfits] = useState({
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0
+    });
+
+    const [selectedRowId, setSelectedRowId] = useState(1);
+
     const rows = [
         { id: 1, type: "SILVER MOISSANITE", dType: "Moissanite", gPct: 0, isSilver: true },
         { id: 2, type: "10KT MOISSANITE", dType: "Moissanite", gPct: 0.427, isSilver: false },
@@ -63,7 +64,7 @@ const EtsyCalc = () => {
         const c = parseFloat(itemSpecs["Main Stone Carat"]) || 0;
         const sdwt = parseFloat(itemSpecs["Side Stone Carat"]) || 0;
         const smwt = parseFloat(itemSpecs["Small Stone Carat"]) || 0;
-        const p = parseFloat(itemSpecs["Desired Profit (INR)"]) || 0;
+        const p = parseFloat(rowProfits[row.id]) || 0;
 
         const isL = row.dType === "Lab-Grown";
         const mainP = isL ? params["Lab-Grown Main Stone (Per Ct)"] : params["Moissanite Main Stone (Per Ct)"];
@@ -71,7 +72,6 @@ const EtsyCalc = () => {
 
         const baseR = row.type === "PLATINUM" ? params["Platinum Rate (Per Gram)"] : params["Gold Rate (Per Gram)"];
         const goldCost = w * baseR * row.gPct;
-
         const currentLaborRate = row.isSilver ? params["Silver Labor (Per Gram)"] : params["Gold Labor (Per Gram)"];
         const laborCost = w * currentLaborRate;
 
@@ -81,7 +81,6 @@ const EtsyCalc = () => {
         const shipping = w > 0 ? Number(params["Shipping & Handling"]) : 0;
 
         const subTotal = goldCost + laborCost + mainCost + sideCost + smallCost + shipping;
-
         const finalINR = (subTotal + p) / (1 - params["Etsy Commission (%)"] / 100);
         const commission = finalINR * (params["Etsy Commission (%)"] / 100);
         const listingINR = finalINR / (1 - params["Listing Discount (%)"] / 100);
@@ -103,22 +102,38 @@ const EtsyCalc = () => {
         };
     };
 
+    const handleProfitChange = (id, val) => {
+        setRowProfits(prev => ({ ...prev, [id]: val }));
+    };
+
     const handleSaveParams = () => {
         localStorage.setItem("master_params_v2", JSON.stringify(params));
         Swal.fire({ icon: "success", title: "Global Rates Updated", timer: 1000, showConfirmButton: false });
     };
 
+
     const handleReset = () => {
         Swal.fire({
-            title: 'Restore Defaults?',
-            text: "This will reset all market rates to factory settings.",
+            title: "Are you sure?",
+            text: "This will revert all Global Rates to their original default values.",
+            // icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#ef4444",
-            confirmButtonText: "Yes, Reset",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, reset them!",
+            cancelButtonText: "Cancel"
         }).then((result) => {
             if (result.isConfirmed) {
                 localStorage.removeItem("master_params_v2");
                 setParams(defaultParams);
+                
+                Swal.fire({
+                    title: "Reset Successful",
+                    text: "Rates have been restored to defaults.",
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         });
     };
@@ -130,29 +145,69 @@ const EtsyCalc = () => {
             <main className="flex-grow p-2 md:p-4">
                 <div className="max-w-[2200px] mx-auto bg-white rounded-lg shadow-xl overflow-hidden border border-slate-200">
                     <div className="bg-white space-y-6 p-4">
-                        {/* Section 1: Item Specifics */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 mb-2 gap-3 md:gap-4">
-                            {Object.keys(itemSpecs).map((key) => (
-                                <div key={key} className="relative overflow-hidden bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm transition-all hover:shadow-md hover:border-blue-200">
-                                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-tight mb-1">{key}</label>
-                                    <input
-                                        type="number"
-                                        value={itemSpecs[key]}
-                                        onChange={(e) => setItemSpecs({ ...itemSpecs, [key]: e.target.value })}
-                                        className="w-full bg-transparent font-semibold text-sm md:text-base text-slate-800 outline-none"
-                                        placeholder="0.00"
-                                    />
-                                    <div className="absolute left-0 top-0 h-full w-1 bg-gray-500" />
-                                </div>
-                            ))}
-                        </div>
 
-                        {/* Section 2: Global Parameters */}
-                        <div className="bg-gradient-to-b from-slate-100 via-slate-50 to-white px-4 py-2 md:py-4 md:px-6 border border-slate-300/70 shadow-[0_10px_28px_-14px_rgba(0,0,0,0.25)]">
-                            <div className="mb-4">
-                                <h3 className="text-[11px] font-semibold text-slate-800 tracking-wide">Global Market Settings</h3>
-                                <div className="h-[1px] w-10 bg-indigo-600/50 mt-1 rounded-full" />
+                        {/* Section 1: Inputs & Dropdown Selector */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+
+                            {/* Item Specs - Grey Background with White Inputs */}
+                            <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {Object.keys(itemSpecs).map((key) => (
+                                    <div key={key} className="flex flex-col bg-slate-100 p-2 rounded-xl border border-slate-200 shadow-sm">
+                                        {/* Label: Grayish area */}
+                                        <label className="px-1.5 text-[9px] font-black text-slate-600 uppercase tracking-tighter mb-1.5">
+                                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                                        </label>
+
+                                        {/* Input: Pure White Contrast */}
+                                        <div className="bg-white rounded-lg border border-slate-300 shadow-sm focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-transparent transition-all">
+                                            <input
+                                                type="number"
+                                                value={itemSpecs[key]}
+                                                onChange={(e) => setItemSpecs({ ...itemSpecs, [key]: e.target.value })}
+                                                className="w-full h-9 px-3 bg-transparent font-bold text-sm text-slate-900 outline-none"
+                                                placeholder="0.00"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
+
+                            {/* Profit Section - Blue Background with White Inputs */}
+                            <div className="lg:col-span-4 grid grid-cols-2 gap-2 bg-blue-50/50 p-2 rounded-xl border border-blue-100 shadow-sm">
+                                {/* Select Row Column */}
+                                <div className="flex flex-col">
+                                    <label className="px-1.5 text-[9px] font-black text-slate-600 uppercase tracking-tighter mb-1.5">
+                                        Select Row</label>
+                                    <div className="bg-white rounded-lg border border-slate-300 shadow-sm focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-transparent transition-all">
+
+                                        <select
+                                            value={selectedRowId}
+                                            onChange={(e) => setSelectedRowId(parseInt(e.target.value))}
+                                            className="w-full  h-9 px-2 bg-transparent text-[11px] font-bold text-slate-600 outline-none cursor-pointer"
+                                        >
+                                            {rows.map(r => <option key={r.id} value={r.id}>{r.type}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Profit Input Column */}
+                                <div className="flex flex-col">
+                                    <label className="px-1.5 text-[9px] font-black text-slate-600 uppercase tracking-tighter mb-1.5">
+                                        Add Profit (₹)</label>
+                                    <div className="bg-white rounded-lg border border-slate-300 shadow-sm focus-within:ring-2 focus-within:ring-blue-400 focus-within:border-transparent transition-all">
+                                        <input
+                                            type="number"
+                                            value={rowProfits[selectedRowId] || ""}
+                                            onChange={(e) => handleProfitChange(selectedRowId, e.target.value)}
+                                            className="w-full h-9 px-3 bg-transparent text-sm font-bold  outline-none"
+                                            placeholder="0"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Section 2: Global Parameters */}
+                        <div className="bg-gradient-to-b from-slate-100 via-slate-50 to-white px-4 py-4 border border-slate-300/70 shadow-sm">
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                 {Object.keys(params).map((key) => (
                                     <div key={key} className="flex flex-col gap-1">
@@ -161,7 +216,7 @@ const EtsyCalc = () => {
                                             type="number"
                                             value={params[key]}
                                             onChange={(e) => setParams({ ...params, [key]: e.target.value })}
-                                            className="h-9 px-3 rounded-xl bg-gradient-to-b from-slate-50 to-slate-200 border border-slate-300 text-[12px] font-semibold text-slate-800 shadow-[inset_0_1px_3_rgba(0,0,0,0.15)] outline-none transition-all hover:from-slate-100 hover:to-slate-200 focus:from-white focus:to-slate-100 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/25 active:scale-[0.98]"
+                                            className="h-9 px-3 rounded-xl bg-white border border-slate-300 text-[12px] font-semibold text-slate-800 outline-none focus:border-blue-400"
                                         />
                                     </div>
                                 ))}
@@ -169,9 +224,8 @@ const EtsyCalc = () => {
                         </div>
                     </div>
 
-                    {/* Section 3: Result View */}
+                    {/* Section 3: Result Table */}
                     <div className="overflow-hidden bg-white border-t border-slate-300">
-                        {/* Desktop Table View */}
                         <div className="hidden lg:block overflow-x-auto">
                             <table className="w-full min-w-[1800px] border-collapse text-[12px] text-center table-fixed">
                                 <thead>
@@ -181,13 +235,14 @@ const EtsyCalc = () => {
                                         <th className="p-2 w-[130px] border-r border-slate-200">Diamond Type</th>
                                         <th className="p-2 w-[110px] border-r border-slate-200">Gold Cost</th>
                                         <th className="p-2 w-[110px] border-r border-slate-200">Labor Cost</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-200">Main Diamond</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-200">Side Diamond</th>
-                                        <th className="p-2 w-[130px] border-r border-slate-200">Small Diamond</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Main Stone</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Side Stone</th>
+                                        <th className="p-2 w-[130px] border-r border-slate-200">Small Stone</th>
                                         <th className="p-2 w-[100px] border-r border-slate-200">Shipping</th>
                                         <th className="p-2 w-[110px] border-r border-slate-200">Commission</th>
+                                        <th className="p-2 w-[110px] border-r border-slate-200">Profit (₹)</th>
                                         <th className="p-2 w-[120px] border-r border-slate-200">Final INR</th>
-                                        <th className="p-2 w-[120px] border-r border-slate-200">Listing INR</th>
+                                        <th className="p-2 w-[120px] border-r border-slate-200 font-bold">Listing INR</th>
                                         <th className="p-2 w-[100px] border-r border-slate-200">Price $</th>
                                         <th className="p-2 w-[120px] border-r border-slate-200 italic">Cost Price</th>
                                     </tr>
@@ -207,49 +262,19 @@ const EtsyCalc = () => {
                                                 <td className="p-2 border-r border-slate-200">₹{c.smallCost}</td>
                                                 <td className="p-2 border-r border-slate-200">₹{c.shipping}</td>
                                                 <td className="p-2 border-r border-slate-200">₹{c.commission}</td>
+                                                {/* Profit as Plain Text (Just like other columns) */}
+                                                <td className="p-2 border-r border-slate-200  bg-blue-50/30">
+                                                    ₹{rowProfits[row.id] || 0}
+                                                </td>
                                                 <td className="p-2 border-r border-slate-200">₹{c.finalINR}</td>
                                                 <td className="p-2 border-r border-slate-200 font-bold">₹{c.listingINR}</td>
-                                                <td className="p-2 border-r border-slate-200">${c.priceUSD}</td>
-                                                <td className="p-2 border-r border-slate-200">₹{c.costPrice}</td>
+                                                <td className="p-2 border-r border-slate-200 font-bold text-slate-800">${c.priceUSD}</td>
+                                                <td className="p-2 border-r border-slate-200 italic">₹{c.costPrice}</td>
                                             </tr>
                                         );
                                     })}
                                 </tbody>
                             </table>
-                        </div>
-
-                        {/* MOBILE CARD VIEW */}
-                        <div className="lg:hidden p-3 grid grid-cols-1 gap-4 bg-slate-100">
-                            {rows.map((row) => {
-                                const c = calculate(row);
-                                return (
-                                    <div key={row.id} className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                                        {/* Header: Metal Type and Price in USD */}
-                                        <div className="bg-slate-200 text-white p-3 flex justify-between items-center">
-                                            <span className="bg-slate-200 text-slate-700 font-bold">{row.type}</span>
-                                            <span className="bg-gray-500 text-white px-3 py-1 rounded-full   font-bold text-sm shadow-sm">
-                                                LISTING ₹{c.listingINR}
-                                            </span>
-                                        </div>
-
-                                        {/* Body: All details including Listing INR */}
-                                        <div className="p-4 grid grid-cols-2 gap-x-4 gap-y-3">
-                                            <DataField label="Diamond Type" value={row.dType} italic />
-                                            <DataField label="Gold %" value={row.gPct > 0 ? (row.gPct * 100).toFixed(1) + '%' : "N/A"} />
-                                            <DataField label="Gold Cost" value={`₹${c.goldCost}`} />
-                                            <DataField label="Labor Cost" value={`₹${c.laborCost}`} />
-                                            <DataField label="Main Stone" value={`₹${c.mainCost}`} />
-                                            <DataField label="Side Stone" value={`₹${c.sideCost}`} />
-                                            <DataField label="Small Stone" value={`₹${c.smallCost}`} />
-                                            <DataField label="Shipping" value={`₹${c.shipping}`} />
-                                            <DataField label="Commission" value={`₹${c.commission}`} />
-                                            <DataField label="Final INR" value={`$${c.finalINR}`} highlight />
-                                            <DataField label="Price$" value={`${c.priceUSD}`} bold />
-                                            <DataField label="Cost Price" value={`₹${c.costPrice}`} italic />
-                                        </div>
-                                    </div>
-                                );
-                            })}
                         </div>
                     </div>
                 </div>
