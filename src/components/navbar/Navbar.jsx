@@ -24,7 +24,7 @@ const Navbar = ({ onReset, onSave }) => {
           {/* CENTER: TITLE – Beautiful & Professional */}
           <div className="hidden md:block text-center flex-1">
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
-              Jewelry Cost Master
+              Essence Jewelry Cost Master
             </h1>
             <p className="text-sm lg:text-base font-medium text-blue-400 mt-1 tracking-wide">
               Gold • Lab Diamonds • Moissanite
@@ -66,7 +66,7 @@ const Navbar = ({ onReset, onSave }) => {
         <div className="md:hidden bg-white border-t border-slate-200 shadow-lg p-6 space-y-5 animate-in slide-in-from-top duration-300">
           <div className="text-center pb-3">
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
-              Jewelry Cost Master
+              Essence Jewelry Cost Master
             </h1>
             <p className="text-sm lg:text-base font-medium text-indigo-600 mt-1 tracking-wide">
               Gold • Lab Diamonds • Moissanite

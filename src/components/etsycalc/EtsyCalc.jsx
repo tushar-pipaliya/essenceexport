@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import "animate.css";
 import Navbar from "../navbar/Navbar";
 import Footer from "../footer/Footer";
+import ListingMediaManager from "../ListingMediaManager/ListingMediaManager";
 
 const EtsyCalc = () => {
     const defaultParams = {
@@ -105,33 +106,33 @@ const EtsyCalc = () => {
         Swal.fire({ icon: "success", title: "Rates Saved!", timer: 1000, showConfirmButton: false });
     };
 
-const handleReset = () => {
-    Swal.fire({
-        title: "Reset All Rates?",
-        text: "This will restore all values to default. This action cannot be undone.",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Reset",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#ff4b4b",   // Indigo
-        cancelButtonColor: "#94a3b8",    // Slate
-        buttonsStyling: true,
-        reverseButtons: false,           // ❗ Cancel first, Confirm second
-        allowOutsideClick: false,        // optional: prevents accidental close
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem("master_params_v4");
-            setParams(defaultParams);
+    const handleReset = () => {
+        Swal.fire({
+            title: "Reset All Rates?",
+            text: "This will restore all values to default. This action cannot be undone.",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Reset",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#ff4b4b",   // Indigo
+            cancelButtonColor: "#94a3b8",    // Slate
+            buttonsStyling: true,
+            reverseButtons: false,           // ❗ Cancel first, Confirm second
+            allowOutsideClick: false,        // optional: prevents accidental close
+        }).then((result) => {
+            if (result.isConfirmed) {
+                localStorage.removeItem("master_params_v4");
+                setParams(defaultParams);
 
-            Swal.fire({
-                icon: "success",
-                title: "Reset Successful",
-                text: "All rates have been restored to default.",
-                timer: 1200,
-                showConfirmButton: false,
-            });
-        }
-    });
-};
+                Swal.fire({
+                    icon: "success",
+                    title: "Reset Successful",
+                    text: "All rates have been restored to default.",
+                    timer: 1200,
+                    showConfirmButton: false,
+                });
+            }
+        });
+    };
 
 
     return (
@@ -142,49 +143,101 @@ const handleReset = () => {
                 <div className="max-w-[2200px] mx-auto bg-white rounded-lg shadow-xl overflow-hidden border border-slate-200">
                     <div className="p-4 space-y-6">
 
-                        {/* FIRST SECTION: MODERN INPUT BOXES */}
-                        <div className="grid grid-cols-2 md:grid-cols-7 gap-3">
-                            {Object.keys(itemSpecs).map((key) => (
-                                <div key={key} className={`flex flex-col p-2 rounded-xl border border-slate-200 shadow-sm transition-all hover:border-blue-300 ${key.includes('Moi') ? 'bg-blue-50' : key.includes('Lab') ? 'bg-blue-50' : 'bg-blue-50'}`}>
-                                    <label className="px-1 text-[9px] font-black text-slate-600 uppercase mb-1 truncate">{key}</label>
-                                    <input
-                                        type="number"
-                                        value={itemSpecs[key]}
-                                        onChange={(e) => setItemSpecs({ ...itemSpecs, [key]: e.target.value })}
-                                        className="w-full h-9 px-3 bg-white border border-slate-300 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-blue-400"
-                                        placeholder="0.00"
-                                    />
-                                </div>
-                            ))}
-                        </div>
 
-                        {/* SECOND SECTION: PROFIT & GLOBAL RATES BEST LAYOUT */}
-                        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4"> {/* Increased total columns to 4 for finer control */}
+                        {/* FIRST SECTION:  PROFIT & GLOBAL RATES BEST LAYOUT*/}
+                        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
 
-                            {/* Global Rates Grid (Moved to first position, width increased) */}
-                            <div className="order-2 xl:order-1 xl:col-span-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
+                            {/* Global Rates Grid - order-1 makes it TOP on mobile */}
+                            <div className="order-1 xl:order-1 xl:col-span-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 p-3 bg-slate-100 rounded-xl border border-slate-200">
                                 {Object.keys(params).map((key) => (
                                     <div key={key} className="flex flex-col">
                                         <label className="text-[10px] font-bold text-slate-500 uppercase truncate">{key}</label>
-                                        <input type="number" value={params[key]} onChange={(e) => setParams({ ...params, [key]: e.target.value })} className="h-8 px-2 rounded-lg border border-slate-300 text-[11px] font-semibold bg-white" />
+                                        <input
+                                            type="number"
+                                            value={params[key]}
+                                            onChange={(e) => setParams({ ...params, [key]: e.target.value })}
+                                            className="h-8 px-2 rounded-lg border border-slate-300 text-[11px] font-semibold bg-white"
+                                        />
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Profit Card (Moved to second position, width decreased) */}
-                            <div className="order-1 xl:order-2 xl:col-span-1 grid grid-cols-1 gap-3 bg-slate-100 p-3 rounded-xl border border-indigo-100 shadow-inner">
+                            {/* Profit Card - order-2 makes it BOTTOM on mobile */}
+                            <div className="order-2 xl:order-2 xl:col-span-1 grid grid-cols-1 gap-3 bg-slate-100 p-3 rounded-xl border border-indigo-100 shadow-inner">
                                 <div className="flex flex-col gap-1">
                                     <label className="text-[10px] font-bold text-slate-500 uppercase">Metal Type</label>
-                                    <select  value={selectedRowId} onChange={(e) => setSelectedRowId(parseInt(e.target.value))} className="h-10 px-3 text-[11px] rounded-lg border border-slate-300 font-bold text-slate-700 bg-white w-full">
+                                    <select
+                                        value={selectedRowId}
+                                        onChange={(e) => setSelectedRowId(parseInt(e.target.value))}
+                                        className="h-10 px-3 text-[11px] rounded-lg border border-slate-300 font-bold text-slate-700 bg-white w-full"
+                                    >
                                         {rows.map(r => <option key={r.id} value={r.id}>{r.type}</option>)}
                                     </select>
                                 </div>
                                 <div className="flex flex-col gap-1 text-[10px]">
-                                    <label className=" font-bold text-slate-500 uppercase">Add Profit (₹)</label>
-                                    <input type="number" value={rowProfits[selectedRowId] || ""} onChange={(e) => setRowProfits(prev => ({ ...prev, [selectedRowId]: e.target.value }))} className="h-10 px-3 text-[11px] rounded-lg border border-slate-300 font-bold outline-none bg-white focus:border-indigo-500 w-full" placeholder="0" />
+                                    <label className="font-bold text-slate-500 uppercase">Add Profit (₹)</label>
+                                    <input
+                                        type="number"
+                                        value={rowProfits[selectedRowId] || ""}
+                                        onChange={(e) => setRowProfits(prev => ({ ...prev, [selectedRowId]: e.target.value }))}
+                                        className="h-10 px-3 text-[11px] rounded-lg border border-slate-300 font-bold outline-none bg-white focus:border-indigo-500 w-full"
+                                        placeholder="0"
+                                    />
                                 </div>
                             </div>
 
+                        </div>
+
+                        {/* SECOND SECTION:  MODERN INPUT BOXES */}
+                        {/* Main Wrapper: 12 Column Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                            {/* LEFT SIDE: Inputs (Now 7/12 columns) */}
+                            <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                {Object.keys(itemSpecs).map((key) => (
+                                    <div
+                                        key={key}
+                                        className="flex flex-col p-3 rounded-xl border border-slate-200 shadow-sm bg-blue-50/30 hover:border-blue-300 transition-colors"
+                                    >
+                                        <label className="px-1 text-[10px] font-black text-slate-500 uppercase mb-1.5 truncate">
+                                            {key}
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={itemSpecs[key]}
+                                            onChange={(e) => setItemSpecs({ ...itemSpecs, [key]: e.target.value })}
+                                            className="w-full h-10 px-3 bg-white border border-slate-300 rounded-lg font-bold text-sm outline-none focus:ring-2 focus:ring-blue-400"
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* RIGHT SIDE: Media Manager (Now 5/12 columns - Increased width) */}
+                            <div className="lg:col-span-5 bg-slate-50/50 p-1 rounded-2xl ">
+                                {(() => {
+                                    const selectedRow = rows.find(r => r.id === selectedRowId);
+                                    // Safety check: if no row is selected, we provide a fallback
+                                    if (!selectedRow) return <div className="p-4 text-slate-400 text-sm text-center italic">Select a row to manage media</div>;
+
+                                    const calculated = calculate(selectedRow);
+
+                                    const dataForManager = {
+                                        ...selectedRow,
+                                        ...calculated,
+                                        profit: rowProfits[selectedRowId] || 0,
+                                        mainCarat: itemSpecs[`${selectedRow.dType === "Lab-Grown" ? "Lab" : "Moi"} Main Carat`],
+                                        sideCarat: itemSpecs[`${selectedRow.dType === "Lab-Grown" ? "Lab" : "Moi"} Side Carat`],
+                                        smallCarat: itemSpecs[`${selectedRow.dType === "Lab-Grown" ? "Lab" : "Moi"} Small Carat`],
+                                    };
+
+                                    return (
+                                        <div className="w-full">
+                                            <ListingMediaManager listingData={dataForManager} />
+                                        </div>
+                                    );
+                                })()}
+                            </div>
                         </div>
 
                         {/* MOBILE CARD VIEW: SHOWING TOTAL DATA */}
