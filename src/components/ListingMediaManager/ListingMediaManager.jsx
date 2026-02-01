@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import JSZip from "jszip";
 import ExcelJS from "exceljs";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, Download } from "lucide-react";
 
 const ListingMediaManager = ({ listingData }) => {
   const [stockId, setStockId] = useState("");
@@ -14,16 +14,16 @@ const ListingMediaManager = ({ listingData }) => {
   // Prevent duplicate file selection
   // -------------------------------
   const addUniqueFiles = (newFiles, prevFiles) => {
-    const existing = new Set(prevFiles.map(f => `${f.name}_${f.size}`));
+    const existing = new Set(prevFiles.map((f) => `${f.name}_${f.size}`));
     return [
       ...prevFiles,
-      ...newFiles.filter(f => !existing.has(`${f.name}_${f.size}`))
+      ...newFiles.filter((f) => !existing.has(`${f.name}_${f.size}`)),
     ];
   };
 
   const handleFileChange = (e, setFiles) => {
     const selected = Array.from(e.target.files);
-    setFiles(prev => addUniqueFiles(selected, prev));
+    setFiles((prev) => addUniqueFiles(selected, prev));
     setZipBlob(null);
   };
 
@@ -35,11 +35,25 @@ const ListingMediaManager = ({ listingData }) => {
     const sheet = workbook.addWorksheet("Listing_Report");
 
     const header = [
-      "Metal Type","Gold %","Weight (g)","Diamond Type","Carat Weight",
-      "Gold Cost","Labor Cost","Main Diamond Cost","SIDE DIAMOND WT",
-      "Side Diamond Cost","SMALL DIAMOND WT","small diamond cost",
-      "Shipping Cost","commission","PROFIT","FINAL PRICE INR",
-      "LISTING INR","PRICE $","COST PRICE"
+      "Metal Type",
+      "Gold %",
+      "Weight (g)",
+      "Diamond Type",
+      "Carat Weight",
+      "Gold Cost",
+      "Labor Cost",
+      "Main Diamond Cost",
+      "SIDE DIAMOND WT",
+      "Side Diamond Cost",
+      "SMALL DIAMOND WT",
+      "small diamond cost",
+      "Shipping Cost",
+      "commission",
+      "PROFIT",
+      "FINAL PRICE INR",
+      "LISTING INR",
+      "PRICE $",
+      "COST PRICE",
     ];
 
     // 1. Add Header Row
@@ -48,17 +62,17 @@ const ListingMediaManager = ({ listingData }) => {
     // 2. Style Header (Yellow Background, Bold, Centered)
     headerRow.eachCell((cell) => {
       cell.fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFF00' } // Yellow
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFFF00" }, // Yellow
       };
       cell.font = { bold: true };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
       cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
       };
     });
 
@@ -82,17 +96,17 @@ const ListingMediaManager = ({ listingData }) => {
       listingData.finalINR,
       listingData.listingINR,
       listingData.priceUSD,
-      listingData.costPrice
+      listingData.costPrice,
     ]);
 
     // 4. Style Data Row (Centered)
     dataRow.eachCell((cell) => {
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
       cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
       };
     });
 
@@ -121,12 +135,12 @@ const ListingMediaManager = ({ listingData }) => {
 
       if (images.length) {
         const imgFolder = root.folder("images");
-        images.forEach(f => imgFolder.file(f.name, f));
+        images.forEach((f) => imgFolder.file(f.name, f));
       }
 
       if (videos.length) {
         const vidFolder = root.folder("videos");
-        videos.forEach(f => vidFolder.file(f.name, f));
+        videos.forEach((f) => vidFolder.file(f.name, f));
       }
 
       const blob = await zip.generateAsync({ type: "blob" });
@@ -162,15 +176,21 @@ const ListingMediaManager = ({ listingData }) => {
       <input hidden multiple type="file" accept={accept} onChange={onChange} />
       <div className="flex items-center gap-2 mb-2">
         <UploadCloud className="w-4 h-4 text-slate-600" />
-        <span className="text-xs font-black uppercase text-slate-500">{title}</span>
+        <span className="text-xs font-black uppercase text-slate-500">
+          {title}
+        </span>
         <span className="text-[10px] text-slate-400">({files.length})</span>
       </div>
       {files.length === 0 ? (
-        <p className="text-[11px] text-slate-400 italic">Click to choose files</p>
+        <p className="text-[11px] text-slate-400 italic">
+          Click to choose files
+        </p>
       ) : (
         <div className="max-h-24 overflow-y-auto space-y-1">
           {files.map((f, i) => (
-            <p key={i} className="text-[10px] text-slate-600 truncate">• {f.name}</p>
+            <p key={i} className="text-[10px] text-slate-600 truncate">
+              • {f.name}
+            </p>
           ))}
         </div>
       )}
@@ -183,13 +203,13 @@ const ListingMediaManager = ({ listingData }) => {
         <input
           placeholder="STOCK ID"
           value={stockId}
-          onChange={e => setStockId(e.target.value.toUpperCase())}
+          onChange={(e) => setStockId(e.target.value.toUpperCase())}
           className="w-40 px-3 py-2 font-bold text-slate rounded-lg text-xs border border-slate-300 bg-white"
         />
         {!zipBlob ? (
           <button
             onClick={handlePrepareListing}
-            disabled={!stockId}
+            disabled={!stockId || (images.length === 0 && videos.length === 0)}
             className="px-3 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold disabled:opacity-40"
           >
             {isGenerating ? "CREATING..." : "GENERATE"}
@@ -197,15 +217,25 @@ const ListingMediaManager = ({ listingData }) => {
         ) : (
           <button
             onClick={handleDownload}
-            className="px-3 py-2 rounded-lg bg-green-600 text-white text-xs font-semibold"
+            className=" cursor-pointer px-3 py-2 gap-0.5 rounded-lg bg-green-600 text-white text-xs font-semibold flex text-center justify-center"
           >
-            DOWNLOAD
+            <Download className="w-4 h-4 " /> DOWNLOAD
           </button>
         )}
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <UploadBox title="Images" files={images} accept="image/*" onChange={e => handleFileChange(e, setImages)} />
-        <UploadBox title="Videos" files={videos} accept="video/*" onChange={e => handleFileChange(e, setVideos)} />
+        <UploadBox
+          title="Images"
+          files={images}
+          accept="image/*"
+          onChange={(e) => handleFileChange(e, setImages)}
+        />
+        <UploadBox
+          title="Videos"
+          files={videos}
+          accept="video/*"
+          onChange={(e) => handleFileChange(e, setVideos)}
+        />
       </div>
     </div>
   );

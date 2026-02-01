@@ -241,35 +241,39 @@ const EtsyCalc = () => {
                         </div>
 
                         {/* MOBILE CARD VIEW: SHOWING TOTAL DATA */}
-                        <div className="md:hidden space-y-4">
-                            {rows.map((row) => {
-                                const c = calculate(row);
-                                return (
-                                    <div key={row.id} className="bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-md">
-                                        <div className="bg-indigo-50 p-2 text-center font-bold uppercase text-[12px]">
-                                            {row.type}
-                                        </div>
-                                        <div className="p-3 grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
-                                            <div className="flex justify-between border-b py-1"><span>Gold %:</span> <span className="font-bold">{row.gPct > 0 ? (row.gPct * 100).toFixed(1) + '%' : "-"}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Weight:</span> <span className="font-bold">{c.rowWeight}g</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Diamond:</span> <span className="font-bold">{row.dType}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Gold Cost:</span> <span className="font-bold">₹{c.goldCost}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Labor:</span> <span className="font-bold">₹{c.laborCost}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Main St:</span> <span className="font-bold">₹{c.mainCost}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Side St:</span> <span className="font-bold">₹{c.sideCost}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Small St:</span> <span className="font-bold">₹{c.smallCost}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Shipping:</span> <span className="font-bold">₹{c.shipping}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Commission:</span> <span className="font-bold">₹{c.commission}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Profit:</span> <span className="font-bold">₹{rowProfits[row.id] || 0}</span></div>
-                                            <div className="flex justify-between border-b py-1 "><span>Final INR:</span> <span className="font-bold">₹{c.finalINR}</span></div>
-                                            <div className="flex justify-between border-b py-1"><span>Listing:</span> <span className="font-bold">₹{c.listingINR}</span></div>
-                                            <div className="flex justify-between border-b py-1 font-bold"><span>Price $:</span> <span className="bg-slate-200 px-2 py-0.5 rounded-full">${c.priceUSD}</span></div>
-                                            <div className="col-span-2 flex justify-between pt-1 italic text-slate-600"><span>Cost Price:</span> <span>₹{c.costPrice}</span></div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                   {/* MOBILE CARD VIEW: MATCHING TABLE DATA EXACTLY */}
+<div className="md:hidden space-y-4">
+    {rows.map((row) => {
+        const c = calculate(row);
+        return (
+            <div key={row.id} className="bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-md">
+                <div className="bg-indigo-50 p-2 text-center font-bold uppercase text-[12px]">
+                    {row.type}
+                </div>
+                <div className="p-3 grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+                    <div className="flex justify-between border-b py-1"><span>Gold %:</span> <span className="font-bold">{row.gPct > 0 ? (row.gPct * 100).toFixed(1) + '%' : "-"}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Weight:</span> <span className="font-bold">{c.rowWeight}g</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Diamond:</span> <span className="font-bold">{row.dType}</span></div>
+                    
+                    {/* These fields were likely missing or inconsistent */}
+                    <div className="flex justify-between border-b py-1"><span>Gold Cost:</span> <span className="font-bold">₹{c.goldCost}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Labor:</span> <span className="font-bold">₹{c.laborCost}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Main St:</span> <span className="font-bold">₹{c.mainCost}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Side St:</span> <span className="font-bold">₹{c.sideCost}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Small St:</span> <span className="font-bold">₹{c.smallCost}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Shipping:</span> <span className="font-bold">₹{c.shipping}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Commission:</span> <span className="font-bold">₹{c.commission}</span></div>
+                    
+                    <div className="flex justify-between border-b py-1"><span>Profit:</span> <span className="font-bold">₹{rowProfits[row.id] || 0}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Final INR:</span> <span className="font-bold">₹{c.finalINR}</span></div>
+                    <div className="flex justify-between border-b py-1"><span>Listing:</span> <span className="font-bold">₹{c.listingINR}</span></div>
+                    <div className="flex justify-between border-b py-1 font-bold"><span>Price $:</span> <span className="bg-slate-200 px-2 py-0.5 rounded-full">${c.priceUSD}</span></div>
+                    <div className="col-span-2 flex justify-between pt-1 italic text-slate-600"><span>Cost Price:</span> <span>₹{c.costPrice}</span></div>
+                </div>
+            </div>
+        );
+    })}
+</div>
                     </div>
 
                     {/* DESKTOP TABLE: PRESERVING YOUR ORIGINAL LAYOUT EXACTLY */}

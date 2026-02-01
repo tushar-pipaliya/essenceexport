@@ -24,25 +24,22 @@ const Navbar = ({ onReset, onSave }) => {
           {/* CENTER: TITLE – Beautiful & Professional */}
           <div className="hidden md:block text-center flex-1">
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
-              Essence Jewelry Cost Master
-            </h1>
-            <p className="text-sm lg:text-base font-medium text-blue-400 mt-1 tracking-wide">
-              Gold • Lab Diamonds • Moissanite
-            </p>
+            Essence Jewelry Pricing System            </h1>
+
           </div>
 
           {/* RIGHT: DESKTOP BUTTONS – Premium Look */}
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={onReset}
-              className="flex items-center gap-2 px-5 py-2.5 text-slate-700 font-semibold text-sm rounded-full border border-slate-300 hover:bg-red-400 hover:text-white transition-all duration-200 active:scale-95"
+              className="flex items-center gap-2  px-3 py-2 rounded-lg text-xs font-bold border border-slate-300 hover:bg-red-500 hover:text-white transition-all duration-200 active:scale-95"
             >
               <RotateCcw size={16} />
-              Reset
+              Reset Rates
             </button>
             <button
               onClick={onSave}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm rounded-full shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 active:scale-95"
+              className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm rounded-lg shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 active:scale-95"
             >
               <Save size={16} />
               Save Rates
@@ -66,22 +63,19 @@ const Navbar = ({ onReset, onSave }) => {
         <div className="md:hidden bg-white border-t border-slate-200 shadow-lg p-6 space-y-5 animate-in slide-in-from-top duration-300">
           <div className="text-center pb-3">
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
-              Essence Jewelry Cost Master
-            </h1>
-            <p className="text-sm lg:text-base font-medium text-indigo-600 mt-1 tracking-wide">
-              Gold • Lab Diamonds • Moissanite
-            </p>
+            Essence Jewelry Pricing System            </h1>
+
           </div>
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => { onReset(); setIsMenuOpen(false); }}
-              className="flex justify-center items-center gap-2 py-3 px-4 bg-slate-100 text-slate-800 rounded-xl font-semibold text-sm hover:bg-red-400 transition-all active:scale-95"
+              className="flex items-center justify-center gap-2  px-3 py-2 rounded-lg text-xs font-bold border border-slate-300 hover:bg-red-500 hover:text-white transition-all duration-200 active:scale-95"
             >
-              <RotateCcw size={18} /> Reset
+              <RotateCcw size={18} /> Reset Rates
             </button>
             <button
               onClick={() => { onSave(); setIsMenuOpen(false); }}
-              className="flex justify-center items-center gap-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all active:scale-95"
+              className="flex justify-center  items-center gap-2 px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm rounded-lg shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 active:scale-95"
             >
               <Save size={18} /> Save Rates
             </button>
