@@ -24,25 +24,25 @@ const Navbar = ({ onReset, onSave }) => {
           {/* CENTER: TITLE – Beautiful & Professional */}
           <div className="hidden md:block text-center flex-1">
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
-              Essence Jewelry Cost Master
+Essence Jewelry Pricing System
             </h1>
-            <p className="text-sm lg:text-base font-medium text-blue-400 mt-1 tracking-wide">
+            {/* <p className="text-sm lg:text-base font-medium text-blue-400 mt-1 tracking-wide">
               Gold • Lab Diamonds • Moissanite
-            </p>
+            </p> */}
           </div>
 
           {/* RIGHT: DESKTOP BUTTONS – Premium Look */}
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={onReset}
-              className="flex items-center gap-2 px-5 py-2.5 text-slate-700 font-semibold text-sm rounded-full border border-slate-300 hover:bg-red-400 hover:text-white transition-all duration-200 active:scale-95"
+              className="flex items-center gap-2 px-3 py-1.5 text-slate-700 font-semibold text-sm rounded-xl border border-slate-300 hover:bg-red-400 hover:text-white transition-all duration-200 active:scale-95"
             >
               <RotateCcw size={16} />
               Reset
             </button>
             <button
               onClick={onSave}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm rounded-full shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 active:scale-95"
+              className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-200/50 hover:shadow-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 active:scale-95"
             >
               <Save size={16} />
               Save Rates
@@ -66,11 +66,9 @@ const Navbar = ({ onReset, onSave }) => {
         <div className="md:hidden bg-white border-t border-slate-200 shadow-lg p-6 space-y-5 animate-in slide-in-from-top duration-300">
           <div className="text-center pb-3">
             <h1 className="text-2xl lg:text-1xl font-bold text-slate-700 ">
-              Essence Jewelry Cost Master
+Essence Jewelry Pricing System
             </h1>
-            <p className="text-sm lg:text-base font-medium text-indigo-600 mt-1 tracking-wide">
-              Gold • Lab Diamonds • Moissanite
-            </p>
+          
           </div>
           <div className="grid grid-cols-2 gap-4">
             <button
