@@ -242,24 +242,43 @@ const ListingMediaManager = ({
     setter(Array.from(e.target.files));
   };
 
-  const handleLoadJson = (e) => {
+const handleLoadJson = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target.result);
-        if (data.stockId) setStockId(data.stockId);
-        if (data.params) setParams(data.params);
-        if (data.itemSpecs) setItemSpecs(data.itemSpecs);
-        if (data.allListingData) setAllListingData(data.allListingData);
-        alert("Full project data loaded to screen!");
-      } catch (err) {
-        alert("Invalid JSON file.");
-      }
+        try {
+            const data = JSON.parse(event.target.result);
+            
+            // 1. Update Specifications
+            if (data.itemSpecs) setItemSpecs(data.itemSpecs);
+            
+            // 2. Update Master Rates
+            if (data.params) setParams(data.params);
+            
+            // 3. Update Profits (The Missing Link)
+            // If the JSON was a backup, it might have rowProfits directly
+            if (data.rowProfits) {
+                setRowProfits(data.rowProfits);
+            } 
+            // If it only has allListingData, we extract profits from there
+            else if (data.allListingData) {
+                const extractedProfits = {};
+                data.allListingData.forEach(row => {
+                    extractedProfits[row.id] = row.profit;
+                });
+                setRowProfits(extractedProfits);
+            }
+
+            if (data.stockId) setStockId(data.stockId);
+            
+            Swal.fire({ icon: "success", title: "Data Restored!", timer: 1500 });
+        } catch (err) {
+            Swal.fire({ icon: "error", title: "Import Failed", text: "Invalid JSON format." });
+        }
     };
     reader.readAsText(file);
-  };
+};
 
 const generateExcelBuffer = async () => {
     const workbook = new ExcelJS.Workbook();

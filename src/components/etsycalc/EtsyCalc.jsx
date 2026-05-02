@@ -452,22 +452,38 @@ const handleResetAll = () => {
 
     const allCalculatedData = rows.map(row => ({ ...row, ...calculate(row), profit: rowProfits[row.id] || 0 }));
 
-    const importProject = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const json = JSON.parse(event.target.result);
-                if (json.itemSpecs) setItemSpecs(json.itemSpecs);
-                if (json.rowProfits) setRowProfits(json.rowProfits);
-                if (json.params) setParams(json.params);
-                Swal.fire({ icon: "success", title: "Product Loaded!", timer: 1000 });
-            } catch (err) { Swal.fire({ icon: "error", title: "Invalid File" }); }
-        };
-        reader.readAsText(file);
-    };
+   const importProject = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const json = JSON.parse(event.target.result);
+            
+            // This is the critical part: 
+            // We must update the state that the Table actually reads from.
+            if (json.itemSpecs) setItemSpecs(json.itemSpecs);
+            if (json.params) setParams(json.params);
+            
+            // Check if the JSON has rowProfits directly, 
+            // or if we need to extract them from allListingData
+            if (json.rowProfits) {
+                setRowProfits(json.rowProfits);
+            } else if (json.allListingData) {
+                const extracted = {};
+                json.allListingData.forEach(row => {
+                    extracted[row.id] = row.profit;
+                });
+                setRowProfits(extracted);
+            }
 
+            Swal.fire({ icon: "success", title: "Product Loaded!", timer: 1000 });
+        } catch (err) { 
+            Swal.fire({ icon: "error", title: "Invalid File" }); 
+        }
+    };
+    reader.readAsText(file);
+};
     return (
         <div className="w-full min-h-screen font-sans text-[10px] flex flex-col bg-slate-50">
             <Navbar onSave={handleSaveRates} onReset={handleResetAll} />
@@ -478,7 +494,7 @@ const handleResetAll = () => {
                             EDIT PRICE, COST, RATE
                             <input type="file" hidden accept=".json" onChange={importProject} />
                         </label>
-                        <p className="text-slate-400 italic text-[11px]">JSON button removed; all data exports via ZIP</p>
+                        <p className="text-slate-400 italic text-[11px]">Click the green button to edit old data.</p>
                     </div>
 
                     <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-slate-200 p-4 space-y-6">
@@ -519,12 +535,15 @@ const handleResetAll = () => {
                                 ))}
                             </div>
                             <div className="lg:col-span-5">
-                                <ListingMediaManager 
-                                    allListingData={allCalculatedData} 
-                                    itemSpecs={itemSpecs}
-                                    rowProfits={rowProfits}
-                                    params={params}
-                                />
+                               <ListingMediaManager 
+    allListingData={allCalculatedData} 
+    itemSpecs={itemSpecs}
+    rowProfits={rowProfits} 
+    setRowProfits={setRowProfits} // ADD THIS LINE
+    params={params}
+    setParams={setParams} // ADD THIS LINE
+    setItemSpecs={setItemSpecs} // ADD THIS LINE
+/>
                             </div>
                         </div>
 
